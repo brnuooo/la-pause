@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-theme="classic">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact · La Pause</title>
+<meta name="description" content="Contact La Pause: support, installation help and questions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;100,700;125,900&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+.faq { margin-top: 40px; display: grid; gap: 12px; max-width: 860px; }
+.faq details { border-radius: 14px; box-shadow: inset 0 0 0 1px var(--rule); padding: 20px 24px; }
+.faq summary { cursor: pointer; font-weight: 700; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--soft); transition: transform .2s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin-top: 12px; color: var(--soft); }
+.mail { display: inline-block; margin-top: 28px; font-weight: 900; font-stretch: 125%; font-size: clamp(22px, 4vw, 48px); line-height: 1.1; word-break: break-all; }
+.mail:hover { color: var(--acc); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="images/la-pause-header.png" alt="La Pause" width="1024" height="206"></a>
+  <nav aria-label="Main">
+    <a href="vst.html">VST</a>
+    <a href="free-vst.html">Free VST</a>
+    <a href="pass.html">Pass</a>
+    <a href="download.html">Download</a>
+    <a href="story.html">Story</a>
+    <a href="contact.html" aria-current="page">Contact</a>
+  </nav>
+</div></header>
+
+<main>
+  <section class="page-hero" style="border-top:0"><div class="wrap">
+    <span class="eyebrow">Contact</span>
+    <h1>Write to us.</h1>
+    <p class="lede">A question, a problem installing a plug-in, an idea: send us an email.</p>
+    <a class="mail" href="mailto:support.lapausestudio@gmail.com">support.lapausestudio@gmail.com</a>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>Frequent questions.</h2>
+    <div class="faq">
+      <details><summary>Which formats do the plug-ins come in?</summary><p>VST3 for Windows and Mac, and Audio Unit for Mac.</p></details>
+      <details><summary>Windows says the installer is unknown. What do I do?</summary><p>Click "More info", then "Run anyway". The full steps are on the <a href="download.html" style="text-decoration:underline">download page</a>.</p></details>
+      <details><summary>My DAW doesn't show the plug-in.</summary><p>Rescan your plug-ins in your DAW's settings, then restart it. If it still doesn't show, email us with your DAW and your system.</p></details>
+      <details><summary>What does the pass include?</summary><p>Every La Pause plug-in, today's and the new ones released during your year, for 70&nbsp;&euro; a year. See the <a href="pass.html" style="text-decoration:underline">pass page</a>.</p></details>
+    </div>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <img src="images/la-pause-logo.png" alt="La Pause" width="1232" height="294">
+  <a href="mailto:support.lapausestudio@gmail.com">support.lapausestudio@gmail.com</a>
+  <span class="todo">[LEGAL NOTICE] &nbsp; [TERMS OF SALE] &nbsp; [PRIVACY]</span>
+</div></footer>
+</body>
+</html>
