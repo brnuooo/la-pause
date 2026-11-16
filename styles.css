@@ -111,3 +111,7 @@ footer { background: #000; color: #a0a0a4; border-top: 0; position: relative; }
 .cols ul { margin: 0; padding-left: 1.1em; }
 .cols li + li { margin-top: 4px; }
 .step-n { display: block; font-weight: 900; font-stretch: 125%; font-size: 40px; color: var(--acc); line-height: 1; margin-bottom: 12px; }
+
+/* The La Pause logo at the top of every page. */
+.brand img { display: block; height: 48px; width: auto; }
+@media (max-width: 560px) { .brand img { height: 36px; } }

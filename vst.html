@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" data-theme="classic">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VST plug-ins · La Pause</title>
+<meta name="description" content="La Pause plug-ins: Twenty3FX, Kick vs Bass and Vocal One. VST3 and Audio Unit for Windows and macOS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;100,700;125,900&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* One plug-in per section: the words on one side, its picture on the other. */
+.vst { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.vst.flip .vst-pic { order: -1; }
+.vst h2 { font-size: clamp(40px, 5vw, 72px); }
+.vst ul { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.vst li { padding-left: 22px; position: relative; color: var(--soft); }
+.vst li::before { content: ""; position: absolute; left: 0; top: .6em; width: 8px; height: 8px; border-radius: 50%; background: var(--acc); }
+.vst-pic img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+.vst-pic.tall { display: flex; justify-content: center; }
+.vst-pic.tall img { width: auto; max-width: 100%; max-height: min(80vh, 760px); }
+@media (max-width: 860px) {
+  .vst { grid-template-columns: minmax(0, 1fr); }
+  .vst.flip .vst-pic { order: 0; }
+  .vst-pic.tall img { max-height: 70vh; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="images/la-pause-header.png" alt="La Pause" width="1024" height="206"></a>
+  <nav aria-label="Main">
+    <a href="vst.html" aria-current="page">VST</a>
+    <a href="story.html">Story</a>
+  </nav>
+</div></header>
+
+<main>
+  <section class="page-hero" style="border-top:0"><div class="wrap">
+    <span class="eyebrow">VST</span>
+    <h1>Three plug-ins for DJs and producers.</h1>
+    <p class="lede">VST3 for Windows and Mac, Audio Unit for Mac. Each one alone, or all three with the pass at 70&nbsp;&euro; a year.</p>
+  </div></section>
+
+  <section id="twenty3fx"><div class="wrap vst">
+    <div>
+      <span class="tag">Available</span>
+      <h2>Twenty3FX</h2>
+      <p class="lede">The DJ mixer's effects, in your DAW.</p>
+      <ul>
+        <li>20 tempo-synced effects on one dial</li>
+        <li>Division from 1/32 to 16/1, Auto or Tap</li>
+        <li>FX Band: lows, mids, highs or all</li>
+        <li>Presets and five finishes</li>
+      </ul>
+      <div class="actions">
+        <a class="btn" href="download.html">Download &middot; 15&nbsp;&euro;</a>
+        <a class="btn ghost" href="twenty3fx.html">Try it</a>
+      </div>
+    </div>
+    <div class="vst-pic tall"><img src="images/twenty3fx-plugin.png" alt="Twenty3FX plug-in" width="772" height="2640" loading="lazy"></div>
+  </div></section>
+
+  <section id="kick-vs-bass"><div class="wrap vst flip">
+    <div>
+      <span class="tag soon">Coming soon</span>
+      <h2>Kick vs Bass</h2>
+      <p class="lede">Shows when your kick and your bass mask each other, and clears it.</p>
+      <ul>
+        <li>Two knobs: more kick, or more bass</li>
+        <li>More options: Reduction, Pump, Attack, Hold, Release, Width, Gain</li>
+        <li>No latency</li>
+      </ul>
+      <div class="actions">
+        <a class="btn ghost" href="index.html#pass">Included in the pass</a>
+      </div>
+    </div>
+    <div class="vst-pic"><img src="images/kick-vs-bass-plugin.png" alt="Kick vs Bass plug-in" width="1800" height="1238" loading="lazy"></div>
+  </div></section>
+
+  <section id="vocal-one"><div class="wrap vst">
+    <div>
+      <span class="tag soon">Coming soon</span>
+      <h2>Vocal One</h2>
+      <p class="lede">A full vocal chain in one plug-in.</p>
+      <ul>
+        <li>Gate, EQ, De-esser, Compressor, Saturation, Doubler, Delay, Reverb</li>
+        <li>Presets by genre: Hip-Hop, R&amp;B, Jazz, Rock, Pop and more</li>
+        <li>Tell it what you want in plain words</li>
+      </ul>
+      <div class="actions">
+        <a class="btn ghost" href="index.html#pass">Included in the pass</a>
+      </div>
+    </div>
+    <div class="vst-pic"><img src="images/vocal-one-plugin.png" alt="Vocal One plug-in" width="1840" height="1280" loading="lazy"></div>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <img src="images/la-pause-logo.png" alt="La Pause" width="1232" height="294">
+  <a href="mailto:support.lapausestudio@gmail.com">support.lapausestudio@gmail.com</a>
+  <span class="todo">[LEGAL NOTICE] &nbsp; [TERMS OF SALE] &nbsp; [PRIVACY]</span>
+</div></footer>
+</body>
+</html>
