@@ -1,124 +1,14 @@
 <!doctype html>
-<html lang="en" data-theme="classic">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<script>try { document.documentElement.dataset.theme = localStorage.getItem('t3-theme') || 'classic'; } catch (e) {}</script>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Twenty3FX · La Pause</title>
-<meta name="description" content="Twenty3FX: 20 tempo-synced DJ mixer effects on one dial. VST3 and Audio Unit for Windows and macOS, 15 €.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;100,700;125,900&display=swap">
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="plugin.css">
-<style>
-/* One screen: the words on the left, the playable plug-in on the right. */
-.t3-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; padding-block: 24px 64px; }
-.t3-hero h1 { font-size: clamp(40px, 5.6vw, 80px); }
-.stage { position: relative; height: min(84vh, 880px); min-height: 560px; overflow: hidden; }
-.stage .camera { transition: none; }
-.themes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.themes button { display: inline-flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 99px; border: 0; background: transparent; box-shadow: inset 0 0 0 1px var(--rule); color: var(--soft); font-weight: 600; font-size: 14px; cursor: pointer; transition: color .2s, box-shadow .2s, transform .2s var(--ease); }
-.themes button:hover { color: var(--copy); transform: translateY(-1px); }
-.themes button[aria-pressed="true"] { color: var(--copy); box-shadow: inset 0 0 0 1.5px var(--copy); }
-.swatch { flex: none; width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(var(--top), var(--bot)); box-shadow: inset 0 0 0 2px var(--pillb); }
-.themes-label { display: block; margin-top: 34px; font-size: 13px; color: var(--soft); letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
-@media (max-width: 860px) {
-  .t3-hero { grid-template-columns: minmax(0, 1fr); }
-  .stage { height: 70vh; min-height: 480px; order: -1; }
-}
-
-.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 44px; }
-.features div { padding: 24px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--rule); }
-.features h3 { font-size: 20px; font-weight: 700; }
-.features p { margin-top: 8px; color: var(--soft); font-size: 15px; }
-@media (max-width: 900px) { .features { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 520px) { .features { grid-template-columns: minmax(0, 1fr); } }
-
-.get { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; }
-.get .price { font-weight: 900; font-stretch: 125%; font-size: clamp(48px, 6vw, 80px); line-height: 1; }
-</style>
+<title>La Pause has moved</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://la-pause.github.io/twenty3fx.html">
+<meta http-equiv="refresh" content="0; url=https://la-pause.github.io/twenty3fx.html">
+<script>location.replace('https://la-pause.github.io/twenty3fx.html' + location.hash);</script>
 </head>
-<body>
-<header class="top"><div class="wrap">
-  <a class="brand" href="index.html"><img src="images/la-pause-header.png" alt="La Pause" width="1024" height="206"></a>
-  <nav aria-label="Main">
-    <a href="vst.html" aria-current="page">VST</a>
-    <a href="free-vst.html">Free VST</a>
-    <a href="pass.html">Pass</a>
-    <a href="download.html">Download</a>
-    <a href="story.html">Story</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-</div></header>
-
-<main>
-  <section style="border-top:0"><div class="wrap t3-hero">
-    <div>
-      <span class="eyebrow">Twenty3FX</span>
-      <h1>The DJ mixer's effects, in your DAW.</h1>
-      <p class="lede">Twenty tempo-synced effects on one dial. Turn the knobs: the plug-in on this page is playable.</p>
-      <div class="actions">
-        <a class="btn" href="download.html">Get Twenty3FX &middot; 15&nbsp;&euro;</a>
-        <a class="btn ghost" href="pass.html">Included in the pass</a>
-      </div>
-      <span class="themes-label">Finish</span>
-      <div class="themes" id="themes">
-        <button type="button"><i class="swatch" data-theme="classic"></i>Classic Black</button>
-        <button type="button"><i class="swatch" data-theme="midnight"></i>Midnight</button>
-        <button type="button"><i class="swatch" data-theme="copper"></i>Copper</button>
-        <button type="button"><i class="swatch" data-theme="emerald"></i>Emerald</button>
-        <button type="button"><i class="swatch" data-theme="platinum"></i>Platinum</button>
-      </div>
-    </div>
-    <div class="stage" id="stage" aria-label="Interactive Twenty3FX plug-in"><div class="camera" id="camera"></div></div>
-  </div></section>
-
-  <section><div class="wrap">
-    <h2>What's inside.</h2>
-    <div class="features">
-      <div><h3>20 effects, one dial</h3><p>Delay, echo, roll, filter, brake, reverb and more, all locked to your tempo.</p></div>
-      <div><h3>Division</h3><p>From 1/32 up to 16/1. Follow your DAW with Auto, or tap your own tempo.</p></div>
-      <div><h3>FX Band</h3><p>Send the effect to the lows, the mids, the highs or everything.</p></div>
-      <div><h3>Reverb rooms</h3><p>Standard, Wide, Hall and Plate, with the room size on Time.</p></div>
-      <div><h3>Color</h3><p>One filter: low-pass to the left, high-pass to the right.</p></div>
-      <div><h3>Presets and finishes</h3><p>Ten factory presets plus your own, and five finishes for the interface.</p></div>
-    </div>
-  </div></section>
-
-  <section><div class="wrap get">
-    <div>
-      <h2>Get Twenty3FX.</h2>
-      <p class="lede">VST3 for Windows and Mac, Audio Unit for Mac.</p>
-    </div>
-    <div class="actions" style="margin-top:0;align-items:center">
-      <span class="price">15&nbsp;&euro;</span>
-      <a class="btn" href="download.html">Download</a>
-    </div>
-  </div></section>
-</main>
-
-<footer><div class="wrap">
-  <img src="images/la-pause-logo.png" alt="La Pause" width="1232" height="294">
-  <a href="mailto:support.lapausestudio@gmail.com">support.lapausestudio@gmail.com</a>
-  <span class="todo">[LEGAL NOTICE] &nbsp; [TERMS OF SALE] &nbsp; [PRIVACY]</span>
-</div></footer>
-
-<script src="plugin.js"></script>
-<script>
-(() => {
-  const stage = document.getElementById('stage');
-  const t3 = Twenty3FX(document.getElementById('camera'));
-  const aim = () => t3.aim(stage);
-  new ResizeObserver(aim).observe(stage);
-  aim();
-
-  // Finish picker: the plug-in and the page change together, and the choice is remembered.
-  const buttons = [...document.querySelectorAll('#themes button')];
-  const mark = (i) => buttons.forEach((b, n) => b.setAttribute('aria-pressed', n === i));
-  t3.onTheme = mark;
-  mark(t3.state.theme);
-  buttons.forEach((b, i) => b.addEventListener('click', () => { if (i !== t3.state.theme) t3.setTheme(i, true); }));
-})();
-</script>
+<body style="background:#0a0a0b;color:#fff;font-family:sans-serif;padding:40px">
+<p>La Pause has moved to <a style="color:#ff6a10" href="https://la-pause.github.io/twenty3fx.html">la-pause.github.io</a>.</p>
 </body>
 </html>
