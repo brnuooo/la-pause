@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="classic">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vocal One · La Pause</title>
+<meta name="description" content="Vocal One is a whole vocal chain in one plug-in: gate, EQ, de-esser, compressor, saturation, doubler, delay and reverb, with presets by genre. VST3 and Audio Unit, by La Pause.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;100,700;125,900&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+.chain { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 44px; counter-reset: mod; }
+.chain div { position: relative; padding: 22px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--rule); counter-increment: mod; }
+.chain div::before { content: counter(mod, decimal-leading-zero); display: block; font-weight: 900; font-stretch: 125%; color: var(--acc); margin-bottom: 10px; }
+.chain h3 { font-size: 20px; font-weight: 700; }
+.chain p { margin-top: 6px; color: var(--soft); font-size: 15px; }
+@media (max-width: 900px) { .chain { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .chain { grid-template-columns: minmax(0, 1fr); } }
+.genres { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 36px; }
+.genres span { padding: 10px 18px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--rule); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html">La Pause</a>
+  <nav aria-label="Main">
+    <a href="twenty3fx.html">Twenty3FX</a>
+    <a href="kick-vs-bass.html">Kick vs Bass</a>
+    <a href="vocal-one.html" aria-current="page">Vocal One</a>
+    <a href="story.html">Story</a>
+    <a href="index.html#pass">Pass</a>
+  </nav>
+</div></header>
+
+<main>
+  <section class="page-hero" style="border-top:0"><div class="wrap">
+    <span class="eyebrow">Vocal One &middot; coming soon</span>
+    <h1>A whole vocal chain in one plug&#8209;in.</h1>
+    <p class="lede">Gate, EQ, de-esser, compressor, saturation, doubler, delay and reverb, in the order your voice goes through them. Start from a preset made for your genre.</p>
+    <div class="actions">
+      <a class="btn" href="index.html#pass">Included in the pass &middot; 70&nbsp;&euro; a year</a>
+      <a class="btn ghost" href="#chain">See the chain</a>
+    </div>
+    <div class="app-frame" data-app="apps/vocal-one/index.html" data-size="920x640" data-title="Vocal One interface"></div>
+  </div></section>
+
+  <section id="chain"><div class="wrap">
+    <h2>Eight modules, one window.</h2>
+    <div class="chain">
+      <div><h3>Gate</h3><p>Cuts the noise between phrases.</p></div>
+      <div><h3>EQ</h3><p>Five bands, from a low cut to a high shelf.</p></div>
+      <div><h3>De-esser</h3><p>Tames harsh esses without dulling the voice.</p></div>
+      <div><h3>Compressor</h3><p>Clean, Opto, FET or Vari-Mu character.</p></div>
+      <div><h3>Saturation</h3><p>Tape, Tube, Console or Fuzz.</p></div>
+      <div><h3>Doubler</h3><p>Width and detune for a thicker voice.</p></div>
+      <div><h3>Delay</h3><p>Synced to your tempo, with ping-pong.</p></div>
+      <div><h3>Reverb</h3><p>Room, Plate, Hall, Chamber or Spring.</p></div>
+    </div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>Presets by genre.</h2>
+    <p class="lede">Pick your style, then a preset like Clean Punch, Trap Wide Air, Drill Grit or Boom Bap Dusty. A built-in guide explains every setting.</p>
+    <div class="genres"><span>Hip-Hop</span><span>R&amp;B / Soul</span><span>Jazz</span><span>Blues</span><span>Rock / Metal</span><span>Pop / Dance</span><span>World</span><span>Other</span></div>
+    <p class="lede" style="margin-top:36px">VST3 for Windows and Mac, Audio Unit for Mac.</p>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <img src="images/la-pause.webp" alt="La Pause: music, events, DJ" width="1945" height="808">
+  <a href="mailto:support.lapausestudio@gmail.com">support.lapausestudio@gmail.com</a>
+  <span class="todo">[LEGAL NOTICE] &nbsp; [TERMS OF SALE] &nbsp; [PRIVACY]</span>
+</div></footer>
+<script src="apps/frame.js"></script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kick vs Bass</title>
+<style>
+@font-face{font-family:"Archivo Black";src:url("font.ttf") format("truetype"),url("ArchivoBlack-Regular.ttf") format("truetype")}
+:root{--bg:#0c0f28;--text:#eef4ff;--kick:#4ef0ff;--bass:#d27bff;--on:#06121c;--dim:#8e9ac4;--well:#151a3a;--line:#2c3262;--accent:linear-gradient(90deg,#4ef0ff,#d27bff,#ffb86b)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+[hidden]{display:none!important}
+/* Archivo Black has no Cyrillic or Asian letters: those come from the system's heavy fonts. */
+.hx{position:relative;width:100%;height:100%;color:var(--text);font-family:"Archivo Black","Arial Black","Microsoft YaHei","Yu Gothic","Malgun Gothic","PingFang SC","Hiragino Sans","Apple SD Gothic Neo",sans-serif;font-weight:900;user-select:none;-webkit-user-select:none}
+canvas{display:block;width:100%;height:100%}
+.top{position:absolute;inset:0 0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);z-index:3}
+.logo{font-size:16px;letter-spacing:.1em;white-space:nowrap}
+.logo b{font-weight:400;background:var(--accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+.role{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.06em;color:var(--dim);white-space:nowrap}
+.actions{display:flex;gap:10px;align-items:center;flex:none}
+button{font-family:inherit;font-weight:900;color:var(--text);border:0;cursor:pointer;letter-spacing:.06em;white-space:nowrap}
+button:focus-visible,.hit:focus-visible,.cell:focus-visible{outline:2px solid var(--kick);outline-offset:2px}
+.tog{position:relative;display:flex;background:var(--well);border-radius:999px;padding:3px;box-shadow:inset 0 0 0 1px var(--line)}
+.tog button{position:relative;z-index:1;background:transparent;color:var(--dim);font-size:11px;padding:7px 13px;border-radius:999px;transition:color .2s}
+.tog button[aria-pressed=true]{color:var(--on)}
+.pill{position:absolute;top:3px;bottom:3px;border-radius:999px;transition:left .35s cubic-bezier(.3,1.4,.5,1),width .35s,background .3s}
+.tabs{position:absolute;top:56px;left:0;right:0;height:40px;display:flex;gap:24px;padding:0 16px;border-bottom:1px solid var(--line);z-index:3}
+.tabs button{background:transparent;color:var(--dim);font-size:11px;padding:0;border-bottom:3px solid transparent;margin-bottom:-1px;transition:color .2s}
+.tabs button[aria-pressed=true]{color:var(--text);border-image:var(--accent) 1}
+.chip{font-size:10px;padding:8px 10px;border-radius:6px;background:var(--well);box-shadow:inset 0 0 0 1px var(--line);display:flex;align-items:center;gap:6px;transition:box-shadow .2s}
+.chip:hover{box-shadow:inset 0 0 0 1px var(--dim)}
+.chip i{width:10px;height:10px;border-radius:50%;background:linear-gradient(90deg,var(--kick) 50%,var(--bass) 50%)}
+.chip svg{width:13px;height:13px}
+.power{width:38px;height:38px;border-radius:50%;background:var(--well);color:var(--dim);display:grid;place-items:center;box-shadow:0 3px 0 #000,inset 0 0 0 2px var(--line);transition:all .15s}
+.power svg{width:18px;height:18px}
+.power[aria-pressed=true]{color:var(--kick);box-shadow:0 1px 0 #000,inset 0 0 0 2px var(--kick),0 0 16px color-mix(in srgb,var(--kick) 50%,transparent);transform:translateY(2px)}
+.menu{position:absolute;top:60px;right:14px;z-index:5;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px;display:grid;gap:2px;min-width:190px;box-shadow:0 12px 30px rgba(0,0,0,.5);transform-origin:top right;animation:pop .25s cubic-bezier(.2,1.5,.4,1)}
+.menu.two{grid-template-columns:1fr 1fr;min-width:260px}
+.menu button{display:flex;align-items:center;gap:10px;background:transparent;font-size:11px;padding:8px 10px;border-radius:6px;text-align:left}
+.menu button:hover{background:var(--well)}
+.menu button[aria-checked=true]{color:var(--kick)}
+.menu i{width:22px;height:12px;border-radius:3px;flex:none}
+.menu small{font-size:10px;color:var(--dim);width:20px}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.hit{position:absolute;border-radius:50%;touch-action:none;cursor:grab;z-index:2}
+.hit:active{cursor:grabbing}
+.more{position:absolute;top:104px;left:0;right:0;bottom:40px;padding:0 18px;z-index:2;transition:opacity .3s}
+.more svg.tl{display:block;width:100%;height:auto}
+.row{display:flex;justify-content:space-around}
+.sep{border-top:1px solid var(--line);margin:6px 0 4px}
+.cell{text-align:center;cursor:ns-resize;padding:6px 4px;border-radius:12px;touch-action:none;transition:background .2s}
+.cell:hover,.cell.act{background:color-mix(in srgb,var(--text) 7%,transparent)}
+.cell .k{display:flex;justify-content:center}
+.cell .tag{font-size:10px;color:var(--dim);letter-spacing:.06em}
+.cell .say{font-size:11px;line-height:1.25;margin-top:3px;min-height:28px;letter-spacing:.04em}
+.cell .val{font-size:10px;color:var(--dim);margin-top:1px}
+.cell .tag,.cell .say,.cell .val{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;font-weight:600;letter-spacing:0}
+.foot{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.07em;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dot.ok{background:var(--kick);box-shadow:0 0 8px var(--kick)}
+.dot.warn{background:#ffb02e;box-shadow:0 0 8px #ffb02e}
+.play{font-size:10px;padding:7px 12px;border-radius:6px;background:var(--well);box-shadow:inset 0 0 0 1px var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><radialGradient id="face" cx="40%" cy="30%" r="80%"><stop id="face1" offset="0"/><stop id="face2" offset="1"/></radialGradient></defs></svg>
+<div class="hx" id="hx">
+  <canvas id="c" role="img" aria-label="Kick vs Bass display"></canvas>
+  <div id="hits"></div>
+  <div class="more" id="more"><svg class="tl" id="tl" viewBox="0 0 864 160"></svg><div class="row" id="row1"></div><div class="sep"></div><div class="row" id="row2"></div></div>
+  <div class="top">
+    <div class="logo">KICK <b>VS</b> BASS</div>
+    <div class="role"><span id="tTrack"></span><div class="tog" role="group" id="tog"><span class="pill" id="pill"></span><button id="rk" aria-pressed="false">KICK</button><button id="rb" aria-pressed="true">BASS</button></div></div>
+    <div class="actions">
+      <button class="chip" id="langBtn" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg><span id="langCode">EN</span></button>
+      <button class="chip" id="themeBtn" title="Next theme"><i></i><span id="tTheme">HOLO</span></button>
+      <button class="power" id="on" aria-pressed="true" aria-label="On"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></button>
+    </div>
+  </div>
+  <div class="tabs" id="views" role="group"><button id="vn" aria-pressed="true"></button><button id="vp" aria-pressed="false"></button></div>
+  <div class="menu" id="menu" role="menu" hidden></div>
+  <div class="menu two" id="lmenu" role="menu" hidden></div>
+  <div class="foot"><span class="dot" id="dot"></span><span id="status"></span><button class="play" id="play" hidden>LISTEN</button></div>
+</div>
+<script>
+const $=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),FONT=getComputedStyle($('hx')).fontFamily;
+const backend=window.__JUCE__&&window.__JUCE__.backend,still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const beat=60/124,centre=62,fl=-72;
+// Plain type for knob numbers and labels.
+const plain=px=>'600 '+Math.round(px)+'px "Segoe UI","Helvetica Neue",Arial,sans-serif';
+
+// HOLO and the other new themes, then the same theme names as Twenty3FX, plus ACID.
+const THEMES={
+  'HOLO':          {bg:'#0c0f28',grad:['#0a0f26','#1a0b2e','#061d26'],text:'#eef4ff',kick:'#4ef0ff',bass:'#d27bff',on:'#06121c',dim:'#8e9ac4',well:'#151a3a',line:'#2c3262',glow:1,face:['#262c5c','#0a0d22'],accent:'linear-gradient(90deg,#4ef0ff,#d27bff,#ffb86b)'},
+  'CLASSIC BLACK': {bg:'#0e0e0f',text:'#eaeaea',kick:'#ff6a10',bass:'#7d97aa',on:'#1a0d04',dim:'#9a9a9a',well:'#1c1c1d',line:'#2e2e31'},
+  'COPPER':        {bg:'#2a1a0e',text:'#f3e9d2',kick:'#e8662c',bass:'#2fb3a6',on:'#1a0d04',dim:'#c9a27c',well:'#3a2616',line:'#5a3c22'},
+  'PLATINUM':      {bg:'#c9ccd0',text:'#1f2124',kick:'#ff6a10',bass:'#2f6fc0',on:'#ffffff',dim:'#55595e',well:'#dadde0',line:'#9da2a7'}};
+let theme='HOLO',T=THEMES.HOLO;
+
+const LANGS={
+  EN:{name:'English',track:'THIS TRACK IS',normal:'NORMAL',more:'MORE OPTIONS',theme:'THEME',linked:'KICK LINKED',sending:'SENDING THE KICK TO THE BASS',busy:'ANOTHER KICK TRACK IS ALREADY LINKED',side:'KICK RECEIVED BY SIDECHAIN',add:'ADD THE PLUG-IN ON THE KICK TRACK TOO',start:'START',wait:'WAIT',end:'END',during:'BASS VOLUME DURING ONE KICK',mk:'I WANT MORE KICK',mb:'I WANT MORE BASS',att:'I WANT MORE BASS AT THE START',hold:'I WANT THE BASS TO WAIT LONGER',rel:'I WANT MORE BASS AT THE END',red:'I WANT A DEEPER HOLE',pump:'I WANT MORE PUMP',width:'I WANT A WIDER HOLE',gain:'I WANT A LOUDER BASS',kickmsg:'NOW PUT THE PLUG-IN ON YOUR BASS TRACK'},
+  FR:{name:'Français',track:'CETTE PISTE EST',normal:'NORMAL',more:"PLUS D'OPTIONS",theme:'THÈME',linked:'KICK RELIÉ',sending:'LE KICK EST ENVOYÉ À LA BASSE',busy:'UNE AUTRE PISTE DE KICK EST DÉJÀ RELIÉE',side:'KICK REÇU PAR SIDECHAIN',add:'AJOUTE AUSSI LE PLUG-IN SUR LA PISTE DU KICK',start:'DÉBUT',wait:'ATTENTE',end:'FIN',during:'VOLUME DE LA BASSE PENDANT UN KICK',mk:'JE VEUX PLUS DE KICK',mb:'JE VEUX PLUS DE BASSE',att:'JE VEUX PLUS DE BASSE AU DÉBUT',hold:'JE VEUX QUE LA BASSE ATTENDE PLUS',rel:'JE VEUX PLUS DE BASSE À LA FIN',red:'JE VEUX UN CREUX PLUS PROFOND',pump:'JE VEUX PLUS DE POMPE',width:'JE VEUX UN CREUX PLUS LARGE',gain:'JE VEUX UNE BASSE PLUS FORTE',kickmsg:'METS MAINTENANT LE PLUG-IN SUR TA PISTE DE BASSE'},
+  ES:{name:'Español',track:'ESTA PISTA ES',normal:'NORMAL',more:'MÁS OPCIONES',theme:'TEMA',linked:'KICK CONECTADO',sending:'ENVIANDO EL KICK AL BAJO',busy:'OTRA PISTA DE KICK YA ESTÁ CONECTADA',side:'KICK RECIBIDO POR SIDECHAIN',add:'AÑADE TAMBIÉN EL PLUG-IN EN LA PISTA DEL KICK',start:'INICIO',wait:'ESPERA',end:'FINAL',during:'VOLUMEN DEL BAJO DURANTE UN KICK',mk:'QUIERO MÁS KICK',mb:'QUIERO MÁS BAJO',att:'QUIERO MÁS BAJO AL INICIO',hold:'QUIERO QUE EL BAJO ESPERE MÁS',rel:'QUIERO MÁS BAJO AL FINAL',red:'QUIERO UN HUECO MÁS PROFUNDO',pump:'QUIERO MÁS BOMBEO',width:'QUIERO UN HUECO MÁS ANCHO',gain:'QUIERO UN BAJO MÁS FUERTE',kickmsg:'AHORA PON EL PLUG-IN EN TU PISTA DE BAJO'},
+  DE:{name:'Deutsch',track:'DIESE SPUR IST',normal:'NORMAL',more:'MEHR OPTIONEN',theme:'THEMA',linked:'KICK VERBUNDEN',sending:'KICK WIRD AN DEN BASS GESENDET',busy:'EINE ANDERE KICK-SPUR IST SCHON VERBUNDEN',side:'KICK PER SIDECHAIN EMPFANGEN',add:'LEG DAS PLUG-IN AUCH AUF DIE KICK-SPUR',start:'ANFANG',wait:'WARTEN',end:'ENDE',during:'BASSLAUTSTÄRKE WÄHREND EINES KICKS',mk:'ICH WILL MEHR KICK',mb:'ICH WILL MEHR BASS',att:'ICH WILL MEHR BASS AM ANFANG',hold:'DER BASS SOLL LÄNGER WARTEN',rel:'ICH WILL MEHR BASS AM ENDE',red:'ICH WILL EIN TIEFERES LOCH',pump:'ICH WILL MEHR PUMPEN',width:'ICH WILL EIN BREITERES LOCH',gain:'ICH WILL EINEN LAUTEREN BASS',kickmsg:'LEG DAS PLUG-IN JETZT AUF DEINE BASS-SPUR'},
+  IT:{name:'Italiano',track:'QUESTA TRACCIA È',normal:'NORMALE',more:'PIÙ OPZIONI',theme:'TEMA',linked:'KICK COLLEGATO',sending:'KICK INVIATO AL BASSO',busy:"UN'ALTRA TRACCIA KICK È GIÀ COLLEGATA",side:'KICK RICEVUTO VIA SIDECHAIN',add:'METTI IL PLUG-IN ANCHE SULLA TRACCIA DEL KICK',start:'INIZIO',wait:'ATTESA',end:'FINE',during:'VOLUME DEL BASSO DURANTE UN KICK',mk:'VOGLIO PIÙ KICK',mb:'VOGLIO PIÙ BASSO',att:"VOGLIO PIÙ BASSO ALL'INIZIO",hold:'VOGLIO CHE IL BASSO ASPETTI DI PIÙ',rel:'VOGLIO PIÙ BASSO ALLA FINE',red:'VOGLIO UN BUCO PIÙ PROFONDO',pump:'VOGLIO PIÙ POMPAGGIO',width:'VOGLIO UN BUCO PIÙ LARGO',gain:'VOGLIO UN BASSO PIÙ FORTE',kickmsg:'ORA METTI IL PLUG-IN SULLA TRACCIA DEL BASSO'},
+  PT:{name:'Português',track:'ESTA FAIXA É',normal:'NORMAL',more:'MAIS OPÇÕES',theme:'TEMA',linked:'KICK CONECTADO',sending:'ENVIANDO O KICK PARA O BAIXO',busy:'OUTRA FAIXA DE KICK JÁ ESTÁ CONECTADA',side:'KICK RECEBIDO POR SIDECHAIN',add:'COLOQUE O PLUG-IN TAMBÉM NA FAIXA DO KICK',start:'INÍCIO',wait:'ESPERA',end:'FIM',during:'VOLUME DO BAIXO DURANTE UM KICK',mk:'QUERO MAIS KICK',mb:'QUERO MAIS BAIXO',att:'QUERO MAIS BAIXO NO INÍCIO',hold:'QUERO QUE O BAIXO ESPERE MAIS',rel:'QUERO MAIS BAIXO NO FIM',red:'QUERO UM BURACO MAIS FUNDO',pump:'QUERO MAIS BOMBEAMENTO',width:'QUERO UM BURACO MAIS LARGO',gain:'QUERO UM BAIXO MAIS FORTE',kickmsg:'AGORA COLOQUE O PLUG-IN NA FAIXA DO BAIXO'},
+  RU:{name:'Русский',track:'ЭТА ДОРОЖКА —',normal:'ОБЫЧНЫЙ',more:'БОЛЬШЕ НАСТРОЕК',theme:'ТЕМА',linked:'КИК ПОДКЛЮЧЁН',sending:'КИК ОТПРАВЛЯЕТСЯ НА БАС',busy:'ДРУГАЯ ДОРОЖКА КИКА УЖЕ ПОДКЛЮЧЕНА',side:'КИК ПОЛУЧЕН ЧЕРЕЗ САЙДЧЕЙН',add:'ПОСТАВЬ ПЛАГИН И НА ДОРОЖКУ КИКА',start:'НАЧАЛО',wait:'ПАУЗА',end:'КОНЕЦ',during:'ГРОМКОСТЬ БАСА ВО ВРЕМЯ КИКА',mk:'ХОЧУ БОЛЬШЕ КИКА',mb:'ХОЧУ БОЛЬШЕ БАСА',att:'ХОЧУ БОЛЬШЕ БАСА В НАЧАЛЕ',hold:'ХОЧУ, ЧТОБЫ БАС ЖДАЛ ДОЛЬШЕ',rel:'ХОЧУ БОЛЬШЕ БАСА В КОНЦЕ',red:'ХОЧУ ПРОВАЛ ГЛУБЖЕ',pump:'ХОЧУ БОЛЬШЕ ПАМПИНГА',width:'ХОЧУ ПРОВАЛ ШИРЕ',gain:'ХОЧУ БАС ГРОМЧЕ',kickmsg:'ТЕПЕРЬ ПОСТАВЬ ПЛАГИН НА ДОРОЖКУ БАСА'},
+  ZH:{name:'中文',track:'这条轨道是',normal:'普通',more:'更多选项',theme:'主题',linked:'底鼓已连接',sending:'正在把底鼓发送到贝斯',busy:'另一条底鼓轨道已连接',side:'已通过侧链收到底鼓',add:'也请在底鼓轨道上加载插件',start:'开始',wait:'等待',end:'结束',during:'一次底鼓期间的贝斯音量',mk:'我要更多底鼓',mb:'我要更多贝斯',att:'我要开头更多贝斯',hold:'我要贝斯等更久',rel:'我要结尾更多贝斯',red:'我要更深的凹陷',pump:'我要更强的泵感',width:'我要更宽的凹陷',gain:'我要更响的贝斯',kickmsg:'现在把插件放到贝斯轨道上'},
+  JA:{name:'日本語',track:'このトラックは',normal:'ノーマル',more:'その他のオプション',theme:'テーマ',linked:'キック接続済み',sending:'キックをベースに送信中',busy:'別のキックトラックが接続済み',side:'サイドチェインでキックを受信',add:'キックトラックにもプラグインを入れてください',start:'開始',wait:'待機',end:'終了',during:'キック中のベース音量',mk:'キックをもっと',mb:'ベースをもっと',att:'頭のベースをもっと',hold:'ベースをもっと待たせる',rel:'終わりのベースをもっと',red:'もっと深いくぼみ',pump:'もっとポンピング',width:'もっと広いくぼみ',gain:'ベースをもっと大きく',kickmsg:'次にベーストラックにプラグインを入れてください'},
+  KO:{name:'한국어',track:'이 트랙은',normal:'기본',more:'추가 옵션',theme:'테마',linked:'킥 연결됨',sending:'킥을 베이스로 보내는 중',busy:'다른 킥 트랙이 이미 연결됨',side:'사이드체인으로 킥 수신',add:'킥 트랙에도 플러그인을 넣으세요',start:'시작',wait:'대기',end:'끝',during:'킥 동안의 베이스 볼륨',mk:'킥을 더',mb:'베이스를 더',att:'시작에 베이스를 더',hold:'베이스가 더 오래 기다리게',rel:'끝에 베이스를 더',red:'더 깊은 홈',pump:'펌핑을 더',width:'더 넓은 홈',gain:'베이스를 더 크게',kickmsg:'이제 베이스 트랙에 플러그인을 넣으세요'}};
+let lang='EN',S=LANGS.EN;
+
+// id, label, low, high, step, unit, colour, timeline zone, turned the other way round
+const PK=[['att','ATTACK',1,30,1,' MS','bass','start'],['hold','HOLD',0,120,1,' MS','bass','wait'],['rel','RELEASE',20,300,5,' MS','bass','end',1],
+          ['red','REDUCTION',0,24,.5,' DB','kick','depth'],['pump','PUMP',0,12,.5,' DB','kick','depth'],['width','WIDTH',.3,2,.1,' OCT','text'],['gain','GAIN',-12,6,.5,' DB','bass']];
+const P={red:13,pump:7,att:5,hold:30,rel:120,width:1.2,gain:1.5,kick:55,bass:25,on:1};
+const shown={};Object.keys(P).forEach(k=>shown[k]={s:P[k],v:0});
+const touched={};
+const st={kickRole:false,more:false,source:'none',cut:0,pumpNow:0,colour:'',kickDb:null};
+let blend=0,slideT=0,lastDraw=0,trackBass=null,ac=null,n=null,next=0,timer=null,pulse=0,lastHit=-1,prevKe=0,focus=null;
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+function send(type,data){if(backend)backend.emitEvent(type,data)}
+function setParam(id,value){P[id]=value;touched[id]=performance.now();send('param',{id,value})}
+function gesture(ids,on){ids.forEach(id=>send(on?'begin':'end',{id}))}
+
+// The two big knobs set the detailed settings, so MORE OPTIONS shows what they chose.
+function fromKick(){const a=P.kick/100;setParam('red',Math.round(a*48)/2);setParam('pump',Math.round(Math.min(12,a*13)*2)/2);setParam('width',Math.round((.5+a*1.2)*10)/10);setParam('att',Math.round(8-a*6))}
+function fromBass(){setParam('gain',Math.round(P.bass/100*6*2)/2)}
+
+function bindDrag(el,{get,set,span,reset,ids}){let d=false,y=0,s=0;
+  el.onpointerdown=e=>{d=true;y=e.clientY;s=get();el.setPointerCapture(e.pointerId);el.classList.add('act');gesture(ids,true)};
+  el.onpointermove=e=>{if(d)set(s+(y-e.clientY)*span/170)};
+  el.onpointerup=el.onpointercancel=()=>{if(d){d=false;el.classList.remove('act');gesture(ids,false)}};
+  el.addEventListener('wheel',e=>{e.preventDefault();gesture(ids,true);set(get()-Math.sign(e.deltaY)*span/25);gesture(ids,false)},{passive:false});
+  el.ondblclick=()=>{gesture(ids,true);reset();gesture(ids,false)};
+  el.onkeydown=e=>{const m={ArrowUp:1,ArrowRight:1,ArrowDown:-1,ArrowLeft:-1}[e.key];if(m){e.preventDefault();gesture(ids,true);set(get()+m*span/25);gesture(ids,false)}}}
+const hits=$('hits');
+function hit(left,top,size,label){const e=document.createElement('div');e.className='hit';e.tabIndex=0;e.setAttribute('role','slider');e.setAttribute('aria-label',label);e.style.cssText='left:'+left+'%;top:'+top+'%;width:'+size+'%;aspect-ratio:1';hits.append(e);return e}
+const nk=hit(22.5,62.5,15,'I WANT MORE KICK'),nb=hit(62.5,62.5,15,'I WANT MORE BASS');
+bindDrag(nk,{get:()=>P.kick,set:v=>{setParam('kick',Math.round(clamp(v,0,100)));fromKick()},span:100,reset:()=>{setParam('kick',55);fromKick()},ids:['kick','red','pump','width','att']});
+bindDrag(nb,{get:()=>P.bass,set:v=>{setParam('bass',Math.round(clamp(v,0,100)));fromBass()},span:100,reset:()=>{setParam('bass',25);fromBass()},ids:['bass','gain']});
+
+// MORE OPTIONS: each knob says in words what turning it up does.
+const cells=PK.map(([id,lab,lo,hi,step,,,,inv],i)=>{const def=P[id],e=document.createElement('div');e.className='cell';e.tabIndex=0;e.setAttribute('role','slider');e.setAttribute('aria-label',lab);
+  e.innerHTML='<div class="k"></div><div class="tag">'+lab+'</div><div class="say"></div><div class="val"></div>';
+  // RELEASE is turned the other way round, so that up always means what its sentence says.
+  const get=()=>inv?lo+hi-P[id]:P[id];
+  bindDrag(e,{get,set:v=>setParam(id,clamp(Math.round((inv?lo+hi-v:v)/step)*step,lo,hi)),span:hi-lo,reset:()=>setParam(id,def),ids:[id]});
+  e.addEventListener('pointerenter',()=>focus=id);e.addEventListener('pointerleave',()=>{if(!e.classList.contains('act'))focus=null});
+  (i<3?$('row1'):$('row2')).append(e);return{e,id,lo,hi,inv,size:i<3?70:58,last:''}});
+
+function svgKnob(v,col,size){const R=size*.42,c=size/2,a0=Math.PI*.75,a=a0+clamp(v,0,1)*Math.PI*1.5,P=b=>(c+Math.cos(b)*R).toFixed(1)+' '+(c+Math.sin(b)*R).toFixed(1),sw=(size*.06).toFixed(1);
+  let o='<svg width="'+size+'" height="'+size+'" aria-hidden="true"><path d="M'+P(a0)+' A'+R+' '+R+' 0 1 1 '+P(a0+Math.PI*1.5)+'" fill="none" stroke="'+rgba(T.text,.12)+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
+  if(v>.003)o+='<path d="M'+P(a0)+' A'+R+' '+R+' 0 '+(a-a0>Math.PI?1:0)+' 1 '+P(a)+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
+  return o+'<circle cx="'+c+'" cy="'+c+'" r="'+(R*.7).toFixed(1)+'" fill="'+T.well+'" stroke="'+rgba(T.text,.14)+'"/><line x1="'+c+'" y1="'+c+'" x2="'+(c+Math.cos(a)*R*.6).toFixed(1)+'" y2="'+(c+Math.sin(a)*R*.6).toFixed(1)+'" stroke="'+T.text+'" stroke-width="'+(size*.045).toFixed(1)+'" stroke-linecap="round"/></svg>'}
+const fmt=v=>Math.abs(v-Math.round(v))<.05?Math.round(v):v.toFixed(1);
+function drawCells(){cells.forEach(c=>{const p=PK.find(q=>q[0]===c.id),v=shown[c.id].s,col=p[6]==='text'?T.text:p[6]==='bass'?bassCol():T[p[6]];let nv=(v-c.lo)/(c.hi-c.lo);if(c.inv)nv=1-nv;
+  const key=nv.toFixed(3)+col+theme+lang;if(key===c.last)return;c.last=key;
+  c.e.querySelector('.k').innerHTML=svgKnob(nv,col,c.size);c.e.querySelector('.say').textContent=S[c.id];c.e.querySelector('.val').textContent=fmt(v)+p[5];c.e.setAttribute('aria-valuetext',fmt(v)+p[5])})}
+
+function applyTheme(name){T=THEMES[name]||THEMES.HOLO;theme=THEMES[name]?name:'HOLO';const r=document.documentElement.style;['bg','text','kick','bass','on','dim','well','line'].forEach(k=>r.setProperty('--'+k,T[k]));
+  r.setProperty('--accent',T.accent||'linear-gradient(90deg,'+T.kick+','+T.kick+')');
+  $('tTheme').textContent=theme;const f=T.face||[T.well,T.well];$('face1').setAttribute('stop-color',f[0]);$('face2').setAttribute('stop-color',f[1]);buildMenu();movePill()}
+function buildMenu(){const m=$('menu');m.innerHTML='';Object.entries(THEMES).forEach(([name,t])=>{const b=document.createElement('button');b.setAttribute('role','menuitemradio');b.setAttribute('aria-checked',name===theme);b.innerHTML='<i style="background:linear-gradient(90deg,'+t.kick+' 50%,'+t.bass+' 50%);box-shadow:0 0 0 1px '+t.line+'"></i>'+name;b.onclick=()=>{applyTheme(name);touched.theme=performance.now();send('theme',{name});closeMenus()};m.append(b)})}
+function buildLangMenu(){const m=$('lmenu');m.innerHTML='';Object.entries(LANGS).forEach(([code,l])=>{const b=document.createElement('button');b.setAttribute('role','menuitemradio');b.setAttribute('aria-checked',code===lang);b.innerHTML='<small>'+code+'</small>'+l.name;b.onclick=()=>{applyLang(code);touched.lang=performance.now();send('lang',{code});closeMenus()};m.append(b)})}
+function applyLang(code){lang=LANGS[code]?code:'EN';S=LANGS[lang];document.documentElement.lang=lang.toLowerCase();
+  $('tTrack').textContent=S.track;$('vn').textContent=S.normal;$('vp').textContent=S.more;$('langCode').textContent=lang;
+  nk.setAttribute('aria-label',S.mk);nb.setAttribute('aria-label',S.mb);buildLangMenu();refreshStatus();movePill()}
+function closeMenus(){$('menu').hidden=$('lmenu').hidden=true;$('themeBtn').setAttribute('aria-expanded',false);$('langBtn').setAttribute('aria-expanded',false)}
+function toggleMenu(menu,btn){return e=>{e.stopPropagation();const open=$(menu).hidden;closeMenus();$(menu).hidden=!open;$(btn).setAttribute('aria-expanded',open)}}
+// Theme change, as in Twenty3FX: one press goes to the next theme, which opens in a circle from the button.
+$('themeBtn').onclick=e=>{e.stopPropagation();const names=Object.keys(THEMES),name=names[(names.indexOf(theme)+1)%names.length];touched.theme=performance.now();send('theme',{name});
+  const go=()=>applyTheme(name);if(still||!document.startViewTransition){go();return}
+  const b=$('themeBtn').getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+  const wipe=document.startViewTransition(go);wipe.ready.then(()=>document.documentElement.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+r+'px at '+x+'px '+y+'px)']},{duration:420,easing:'cubic-bezier(.45,0,.9,.55)',pseudoElement:'::view-transition-new(root)'})).catch(()=>{})};$('langBtn').onclick=toggleMenu('lmenu','langBtn');
+document.addEventListener('click',e=>{if(!$('menu').contains(e.target)&&!$('lmenu').contains(e.target))closeMenus()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus()});
+
+function movePill(){const b=$(st.kickRole?'rk':'rb'),p=$('pill'),col=st.kickRole?T.kick:bassCol();p.style.left=b.offsetLeft+'px';p.style.width=b.offsetWidth+'px';p.style.background=col;p.style.boxShadow=T.glow?'0 0 14px '+col:'none'}
+function refreshUi(){const k=st.kickRole,m=st.more;$('rb').setAttribute('aria-pressed',!k);$('rk').setAttribute('aria-pressed',k);$('views').hidden=k;$('on').hidden=k;$('vn').setAttribute('aria-pressed',!m);$('vp').setAttribute('aria-pressed',m);nk.hidden=nb.hidden=k||m;$('more').hidden=k;$('more').style.pointerEvents=m?'auto':'none';const on=P.on>.5;$('on').setAttribute('aria-pressed',on);$('on').setAttribute('aria-label',on?'On':'Off');movePill();refreshStatus()}
+function refreshStatus(){let text,cls;
+  if(st.kickRole){if(st.source==='busy'){text=S.busy;cls='warn'}else{text=S.sending;cls='ok'}}
+  else if(st.source==='linked'){text=S.linked;cls='ok'}
+  else if(st.source==='sidechain'){text=S.side;cls='ok'}
+  else{text=S.add;cls='warn'}
+  if($('status').textContent!==text)$('status').textContent=text;$('dot').className='dot '+cls}
+$('rb').onclick=()=>{st.kickRole=false;touched.ui=performance.now();send('role',{kick:false});refreshUi()};
+$('rk').onclick=()=>{st.kickRole=true;touched.ui=performance.now();send('role',{kick:true});refreshUi()};
+$('vn').onclick=()=>{st.more=false;touched.ui=performance.now();send('view',{more:false});refreshUi()};
+$('vp').onclick=()=>{st.more=true;touched.ui=performance.now();send('view',{more:true});refreshUi()};
+$('on').onclick=()=>{setParam('on',P.on>.5?0:1);refreshUi()};
+
+if(backend)backend.addEventListener('state',s=>{const t=performance.now();Object.keys(P).forEach(k=>{if(!(t-(touched[k]||0)<400)&&s.p&&s.p[k]!==undefined)P[k]=+s.p[k]});
+  st.source=s.source;st.cut=s.cut;st.pumpNow=s.pumpNow;st.kickDb=s.kickDb;st.bassDb=s.bassDb;st.cutDb=s.cutDb;
+  if(!(t-(touched.ui||0)<400)){st.kickRole=s.kickRole;st.more=s.more}
+  if(!(t-(touched.theme||0)<400)&&s.theme&&s.theme!==theme)applyTheme(s.theme);
+  if(!(t-(touched.lang||0)<400)&&s.lang&&s.lang!==lang&&LANGS[s.lang])applyLang(s.lang);
+  trackBass=usable(s.colour);refreshUi()});
+
+// A track colour too close to the background would disappear, so those keep the theme's colour.
+function lum(hex){const c=parseInt(hex.slice(1),16);return .3*(c>>16&255)+.59*(c>>8&255)+.11*(c&255)}
+function usable(hex){if(!hex||hex.length!==7)return null;return Math.abs(lum(hex)-lum(T.bg))>60?hex:null}
+function rgba(hex,a){const c=parseInt(hex.slice(1),16);return'rgba('+(c>>16&255)+','+(c>>8&255)+','+(c&255)+','+clamp(a,0,1)+')'}
+const bassCol=()=>trackBass||T.bass;
+
+const now=()=>ac&&timer?ac.currentTime:performance.now()/1000;
+function env(t){const s=((t%beat)+beat)%beat,a=P.att/1000,h=a+P.hold/1000;if(s<a)return s/a;return s<h?1:Math.exp(-(s-h)/(P.rel/1000/2.2))}
+const spaced=px=>{if('letterSpacing' in g)g.letterSpacing=px+'px'};
+
+function paintBg(w,h){if(T.grad){const lg=g.createLinearGradient(0,0,w,h);T.grad.forEach((c,i)=>lg.addColorStop(i/(T.grad.length-1),c));g.fillStyle=lg}else g.fillStyle=T.bg;g.fillRect(0,0,w,h)}
+
+// A plain knob: a thin track, the value in colour, a flat cap with a pointer, the number under it.
+function knob(x,y,R,val,col,pulseAmount,label){const a0=Math.PI*.75,v=clamp(val,0,1),a=a0+v*Math.PI*1.5;g.save();g.translate(x,y);g.lineCap='round';
+  g.lineWidth=R*.1;g.strokeStyle=rgba(T.text,.12);g.beginPath();g.arc(0,0,R,a0,a0+Math.PI*1.5);g.stroke();
+  if(v>.003){g.strokeStyle=col;g.beginPath();g.arc(0,0,R,a0,a);g.stroke()}
+  g.fillStyle=T.well;g.beginPath();g.arc(0,0,R*.72*(1+pulseAmount*.02),0,7);g.fill();g.strokeStyle=rgba(T.text,.14);g.lineWidth=1;g.stroke();
+  g.strokeStyle=T.text;g.lineWidth=R*.07;g.beginPath();g.moveTo(Math.cos(a)*R*.2,Math.sin(a)*R*.2);g.lineTo(Math.cos(a)*R*.62,Math.sin(a)*R*.62);g.stroke();
+  if(label!==undefined){g.fillStyle=T.text;g.textAlign='center';g.textBaseline='middle';g.font=plain(R*.3);g.fillText(label,0,R*1.28)}g.restore()}
+
+// THE CLASH: how much the bass still stands in the kick's way, shown big, with the two knobs under it.
+const CL={EN:["HEAVY MASKING", "SOME MASKING", "NO MASKING ✓", "The bass masks your kick on every hit.", "Turn the kick up a little more to clear it.", "Your kick cuts through cleanly over the bass.", "", "WAITING FOR THE KICK"],
+ FR:["MASKING FORT", "MASKING LÉGER", "AUCUN MASKING ✓", "Ta basse masque ton kick à chaque coup.", "Monte encore un peu le kick pour le dégager.", "Ton kick passe net au-dessus de la basse.", "", "J'ATTENDS LE KICK"],
+ ES:["MASKING FUERTE", "MASKING LIGERO", "SIN MASKING ✓", "El bajo tapa tu kick en cada golpe.", "Sube un poco más el kick para despejarlo.", "Tu kick pasa limpio sobre el bajo.", "", "ESPERANDO EL KICK"],
+ DE:["STARKES MASKING", "LEICHTES MASKING", "KEIN MASKING ✓", "Der Bass verdeckt deinen Kick bei jedem Schlag.", "Dreh den Kick noch etwas auf, um ihn freizustellen.", "Dein Kick setzt sich sauber über dem Bass durch.", "", "WARTE AUF DEN KICK"],
+ IT:["MASKING FORTE", "MASKING LEGGERO", "NESSUN MASKING ✓", "Il basso copre il tuo kick a ogni colpo.", "Alza ancora un po' il kick per liberarlo.", "Il tuo kick passa pulito sopra il basso.", "", "ASPETTO IL KICK"],
+ PT:["MASKING FORTE", "MASKING LEVE", "SEM MASKING ✓", "O baixo encobre o seu kick a cada batida.", "Aumente mais um pouco o kick para liberá-lo.", "O seu kick passa limpo por cima do baixo.", "", "ESPERANDO O KICK"],
+ RU:["СИЛЬНОЕ МАСКИРОВАНИЕ", "ЛЁГКОЕ МАСКИРОВАНИЕ", "МАСКИРОВАНИЯ НЕТ ✓", "Бас маскирует кик на каждом ударе.", "Добавь ещё немного кика, чтобы его освободить.", "Кик чисто проходит над басом.", "", "ЖДУ КИК"],
+ ZH:["严重掩蔽", "轻微掩蔽", "无掩蔽 ✓", "贝斯每一下都掩盖了底鼓。", "再把底鼓调高一点就能让它出来。", "底鼓干净地压过了贝斯。", "", "等待底鼓"],
+ JA:["マスキング大", "マスキング小", "マスキングなし ✓", "ベースが毎回キックをマスクしています。", "キックをもう少し上げると抜けてきます。", "キックがベースの上にきれいに抜けています。", "", "キック待ち"],
+ KO:["마스킹 심함", "마스킹 약간", "마스킹 없음 ✓", "베이스가 매번 킥을 가립니다.", "킥을 조금 더 올리면 살아납니다.", "킥이 베이스 위로 깨끗하게 들립니다.", "", "킥 대기 중"]};
+const CLASH='#e5322b',hist=[];let clashNow=.6,bassNow=.5;
+// From the plug-in's own spectra: during each hit, how close the bass (after the cut) comes to the kick
+// where the kick lives. Level with the kick is a big clash; 12 dB under it is clean.
+function measureClash(){if(!st.kickDb||!st.bassDb)return null;let acc=0,wsum=0,peak=-120;
+  for(let i=0;i<96;i++){const f=20*Math.pow(50,i/95);if(f<35||f>180)continue;const k=st.kickDb[i]/10,b=st.bassDb[i]/10+P.gain-(st.cutDb?st.cutDb[i]/10:0);peak=Math.max(peak,b);if(k<-60)continue;const wgt=Math.pow(10,k/20);acc+=wgt*clamp(b-k,-24,6);wsum+=wgt}
+  return{clash:wsum?clamp((acc/wsum+12)/12,0,1):null,bass:clamp((peak+48)/36,0,1)}}
+function normalView(w,h,e,ke){const k=shown.kick.s/100,b=shown.bass.s/100,bc=bassCol(),L=CL[lang]||CL.EN,waiting=backend&&st.source!=='linked'&&st.source!=='sidechain';
+  if(backend){const m=measureClash();if(m){bassNow+=(m.bass-bassNow)*.3;if(m.clash!==null&&ke>.55)clashNow+=(m.clash-clashNow)*.12}}
+  else{clashNow+=(clamp(.95-shown.kick.s*.012+shown.bass.s*.004,0,1)-clashNow)*.1;bassNow=(.3+b*.4)*(1-e*.85*(1-clashNow))}
+  hist.push({k:ke,b:bassNow,o:Math.min(ke,bassNow)*clashNow});if(hist.length>400)hist.shift();
+  paintBg(w,h);const cl=clashNow;
+  g.textAlign='center';g.textBaseline='alphabetic';
+  // The verdict, big, with one sentence of help under it.
+  const verdict=waiting?L[7]:cl>.5?L[0]:cl>.15?L[1]:L[2];g.save();g.translate(w/2,h*.255);if(!waiting&&cl>.5)g.scale(1+ke*.04,1+ke*.04);
+  g.font=Math.round(w*.05)+'px '+FONT;g.fillStyle=waiting?T.dim:cl>.15?CLASH:T.text;spaced(w*.002);g.fillText(verdict,0,0);spaced(0);g.restore();
+  if(!waiting){g.font=Math.max(11,Math.round(w*.0155))+'px '+FONT;g.fillStyle=T.dim;g.fillText(cl>.5?L[3]:cl>.15?L[4]:L[5],w/2,h*.255+30)}
+  // The two circles: the kick grows with its knob and pushes the bass away; where they overlap is red.
+  const cx=w*.29,cy=h*.47,kr=w*(.038+k*.018),br=w*(.034+b*.022),d=(kr+br)*(.55+(1-cl)*.6),kx=cx-d/2,bx=cx+d/2,kR=kr*(1+ke*.08),bR=br*(1-e*.07);
+  g.save();g.beginPath();g.arc(kx,cy,kR,0,7);g.clip();g.beginPath();g.arc(bx,cy,bR,0,7);g.fillStyle=CLASH;g.globalAlpha=waiting?.2:1;g.fill();g.restore();
+  g.lineWidth=3;g.strokeStyle=T.kick;g.beginPath();g.arc(kx,cy,kR,0,7);g.stroke();g.strokeStyle=bc;g.beginPath();g.arc(bx,cy,bR,0,7);g.stroke();
+  g.font=Math.round(w*.015)+'px '+FONT;g.fillStyle=T.kick;g.fillText('KICK',kx-kR*.3,cy+5);g.fillStyle=bc;g.fillText('BASS',bx+bR*.3,cy+5);
+  // Every hit as it happens, scrolling: the kick's outline, the bass behind it, the clash in red.
+  const x0=w*.53,tw=w*.42,n=Math.min(hist.length,Math.floor(tw/2));for(let i=0;i<n;i++){const s=hist[hist.length-n+i],x=x0+tw-(n-i)*2,hh=h*.1;
+    g.fillStyle=rgba(bc,.35);g.fillRect(x,cy-s.b*hh,2,s.b*hh*2);g.fillStyle=CLASH;g.globalAlpha=Math.min(1,s.o*2.4);g.fillRect(x,cy-s.o*hh,2,s.o*hh*2);g.globalAlpha=1;g.fillStyle=T.kick;g.fillRect(x,cy-s.k*hh*1.1,2,1.5);g.fillRect(x,cy+s.k*hh*1.1,2,1.5)}
+  // The legend in the colours actually used, since the theme changes them.
+  g.textAlign='left';g.font=Math.max(10,Math.round(w*.012))+'px '+FONT;let lx=x0;[['KICK',T.kick],['BASS',bc],['MASKING',CLASH]].forEach(([t,c])=>{g.fillStyle=c;g.fillRect(lx,cy+h*.1+17,9,9);g.fillStyle=T.dim;g.fillText(t,lx+14,cy+h*.1+26);lx+=g.measureText(t).width+34});
+  g.fillStyle=rgba(T.text,.12);g.fillRect(w*.03,h*.64,w*.94,1);
+  // The two knobs.
+  const R=w*.055,ky=h*.735,kx2=w*.3,bx2=w*.7;g.textAlign='center';knob(kx2,ky,R,k,T.kick,ke,Math.round(shown.kick.s));knob(bx2,ky,R,b,bc,0,Math.round(shown.bass.s));
+  g.font=plain(Math.max(12,w*.017));g.fillStyle=T.dim;g.fillText(S.mk,kx2,ky+R*1.62+12);g.fillText(S.mb,bx2,ky+R*1.62+12);g.textAlign='left'}
+
+// The bass volume over one kick: START, WAIT and END are the attack, hold and release.
+function timeline(ms,ke,total){const W=864,top=30,bot=124,span=420,X=t=>18+t/span*(W-36),Y=l=>bot-(bot-top)*l,F='font-family="'+FONT.replace(/"/g,"'")+'" font-size="11"',bc=bassCol();
+  const a=shown.att.s,h=shown.hold.s,rl=shown.rel.s,d=Math.min(1,(shown.red.s*.6+shown.pump.s)/24)*(P.on>.5?1:0);
+  const lev=t=>t<0?1:t<a?1-d*t/a:t<a+h?1-d:1-d*Math.exp(-(t-a-h)/(rl/2.2));
+  const z=(PK.find(p=>p[0]===focus)||[])[7];let path='M'+X(0)+' '+Y(1);for(let t=0;t<=span;t+=3)path+=' L'+X(t).toFixed(1)+' '+Y(lev(t-20)).toFixed(1);
+  // The three names are pushed apart so that a short zone does not print over its neighbour.
+  let o='',lx=-1e9;[['start',S.start,20,a],['wait',S.wait,20+a,h],['end',S.end,20+a+h,rl]].forEach(([zn,txt,s0,l])=>{o+='<rect x="'+X(s0)+'" y="'+top+'" width="'+Math.max(0,X(Math.min(span,s0+l))-X(s0))+'" height="'+(bot-top)+'" fill="'+(z===zn?bc:T.text)+'" fill-opacity="'+(z===zn?.22:.05)+'"/>';
+    const x=Math.max(X(s0)+(X(Math.min(span,s0+l))-X(s0))/2,lx+90,X(0)+30);lx=x;o+='<text x="'+x+'" y="'+(bot+20)+'" fill="'+(z===zn?bc:T.dim)+'" '+F+' text-anchor="middle">'+txt+'</text>'});
+  o+='<rect x="'+(X(20)-5)+'" y="'+(top-4)+'" width="10" height="'+(bot-top+4)+'" rx="5" fill="'+T.kick+'" opacity="'+(.35+ke*.65)+'"'+(T.glow?' filter="url(#glow)"':'')+'/><text x="'+X(20)+'" y="'+(top-12)+'" fill="'+T.kick+'" '+F+' text-anchor="middle">KICK</text>';
+  o+='<path d="'+path+' L'+X(span)+' '+bot+' L'+X(0)+' '+bot+' Z" fill="'+bc+'" fill-opacity=".18"/><path d="'+path+'" fill="none" stroke="'+bc+'" stroke-width="3" stroke-linejoin="round"'+(T.glow?' filter="url(#glow)"':'')+'/>';
+  if(z==='depth')o+='<line x1="'+X(20+a)+'" x2="'+X(20+a)+'" y1="'+Y(1)+'" y2="'+Y(1-d)+'" stroke="'+T.kick+'" stroke-width="3"/>';
+  if(ms>=0&&ms<span){o+='<line x1="'+X(ms)+'" x2="'+X(ms)+'" y1="'+top+'" y2="'+bot+'" stroke="'+T.text+'" stroke-opacity=".45"/><circle cx="'+X(ms)+'" cy="'+Y(lev(ms-20))+'" r="5" fill="'+T.text+'"/>'}
+  o+='<text x="'+(W-18)+'" y="'+(top-12)+'" fill="'+T.dim+'" '+F+' text-anchor="end">'+S.during+(total>.3?'  <tspan fill="'+T.kick+'">-'+total.toFixed(1)+' DB</tspan>':'')+'</text>';
+  $('tl').innerHTML=o}
+
+function kickView(w,h,ke){paintBg(w,h);const lg=g.createLinearGradient(0,h,0,0);lg.addColorStop(0,rgba(T.kick,.3+ke*.25));lg.addColorStop(1,rgba(T.kick,0));g.fillStyle=lg;g.fillRect(0,0,w,h);g.textAlign='center';g.textBaseline='middle';spaced(w*.006);g.font=w*.15*(1+ke*.05)+'px '+FONT;g.fillStyle=rgba(T.text,.85+ke*.15);if(T.glow){g.shadowColor=T.kick;g.shadowBlur=30*ke}g.fillText('KICK',w/2,h*.42);g.shadowBlur=0;spaced(w*.002);g.font=Math.max(11,w*.021)+'px '+FONT;g.fillStyle=T.text;g.fillText(S.kickmsg,w/2,h*.62);spaced(0)}
+
+function draw(){const r=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*r)||cv.height!==Math.round(h*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r)}g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);
+  Object.keys(P).forEach(k=>{const o=shown[k];if(still){o.s=P[k];return}o.v=(o.v+(P[k]-o.s)*.2)*.62;o.s+=o.v});
+  let e,ke,ms;const on=P.on>.5,t=performance.now();
+  if(backend){const peak=st.kickDb?Math.max(...st.kickDb)/10:fl,lvl=clamp((peak+42)/30,0,1);pulse=lvl>pulse?lvl:pulse+(lvl-pulse)*.2;ke=pulse;const tot=P.red+P.pump;e=tot>0?clamp((st.cut+st.pumpNow)/tot,0,1):0;
+    if(ke>.6&&prevKe<=.6)lastHit=t;prevKe=ke;ms=lastHit<0?-1:(t-lastHit)+20}
+  else{const tt=now(),ph=((tt%beat)+beat)%beat;ke=still?.4:Math.exp(-ph/.14);e=!on?0:still?.4:env(tt);ms=ph*1000+20}
+  // BLINKING LED: the status light flashes with each kick.
+  const dot=$('dot');if(dot.classList.contains('ok')){dot.style.transform='scale('+(1+ke*.6)+')';dot.style.opacity=.45+ke*.55}else{dot.style.transform='';dot.style.opacity=1}
+  // NORMAL and MORE OPTIONS slide side by side, a quarter of a second at an even pace.
+  const tNow=performance.now(),dt=Math.min(.1,(tNow-(lastDraw||tNow))/1000),aim=st.more?1:0;lastDraw=tNow;
+  slideT=still?aim:slideT+Math.sign(aim-slideT)*Math.min(Math.abs(aim-slideT),dt/.25);blend=slideT<.5?4*slideT**3:1-Math.pow(2-2*slideT,3)/2;
+  if(st.kickRole){kickView(w,h,ke)}else{
+    if(blend<.999){g.save();g.translate(-w*blend,0);normalView(w,h,e,ke);g.restore()}
+    if(blend>.001){g.save();g.translate(w*(1-blend),0);paintBg(w,h);g.restore();const total=backend?st.cut+st.pumpNow:(P.red+P.pump)*e*(on?1:0);timeline(ms,ke,total);drawCells()}
+    const m=$('more');m.style.opacity=1;m.style.visibility=blend>.001?'visible':'hidden';m.style.transform='translateX('+(w*(1-blend))+'px)'}
+  requestAnimationFrame(draw)}
+
+// Opened in a plain browser, the page runs on its own so that it can be checked without a DAW.
+function hitKick(t){const o=ac.createOscillator(),m=ac.createGain();o.frequency.setValueAtTime(170,t);o.frequency.exponentialRampToValueAtTime(58,t+.07);m.gain.setValueAtTime(.0001,t);m.gain.exponentialRampToValueAtTime(.85,t+.004);m.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(m).connect(n.master);o.start(t);o.stop(t+.32);const a=P.att/1000,h=a+P.hold/1000,s=P.rel/1000/2.2,on=P.on>.5,red=on?P.red:0,pump=on?P.pump:0;n.peak.gain.cancelScheduledValues(t);n.whole.gain.cancelScheduledValues(t);n.peak.gain.setValueAtTime(0,t);n.peak.gain.linearRampToValueAtTime(-red,t+a);n.peak.gain.setTargetAtTime(0,t+h,s);n.whole.gain.setValueAtTime(1,t);n.whole.gain.linearRampToValueAtTime(Math.pow(10,-pump/20),t+a);n.whole.gain.setTargetAtTime(1,t+h,s);n.peak.Q.setValueAtTime(1.4/P.width,t);n.out.gain.setValueAtTime(Math.pow(10,(on?P.gain:0)/20),t)}
+function sched(){while(next<ac.currentTime+.12){hitKick(next);next+=beat}}
+if(!backend){st.source='linked';$('play').hidden=false;$('play').onclick=()=>{if(timer){clearInterval(timer);timer=null;ac.suspend();$('play').textContent='LISTEN';return}if(!ac){ac=new(window.AudioContext||window.webkitAudioContext)();const master=ac.createGain();master.gain.value=.55;master.connect(ac.destination);const low=ac.createBiquadFilter();low.type='lowpass';low.frequency.value=500;const peak=ac.createBiquadFilter();peak.type='peaking';peak.frequency.value=centre;const whole=ac.createGain(),out=ac.createGain();[['sawtooth',.28],['sine',.5]].forEach(([ty,l])=>{const o=ac.createOscillator(),m=ac.createGain();o.type=ty;o.frequency.value=55;m.gain.value=l;o.connect(m).connect(low);o.start()});low.connect(peak).connect(whole).connect(out).connect(master);n={master,peak,whole,out}}ac.resume();next=Math.ceil(ac.currentTime/beat)*beat;timer=setInterval(sched,25);sched();$('play').textContent='STOP'}}
+applyTheme('HOLO');applyLang(backend?'EN':(navigator.language||'en').slice(0,2).toUpperCase());refreshUi();draw();
+if(document.fonts)document.fonts.ready.then(movePill);
+</script>
+</body>
+</html>
